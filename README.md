@@ -1,1 +1,1 @@
-# abd-constrole-estoque
+# abd-controle-estoque
