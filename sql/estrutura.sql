@@ -61,3 +61,36 @@ CREATE TABLE movimentacao (
     ON DELETE RESTRICT ON UPDATE CASCADE,
   CHECK (quantidade > 0)
 );
+
+-- TRIGGER
+DELIMITER $$
+
+CREATE TRIGGER trg_atualiza_estoque
+BEFORE INSERT ON movimentacao
+FOR EACH ROW
+BEGIN
+    DECLARE estoque_atual INT;
+
+    SELECT quantidade INTO estoque_atual
+    FROM produto
+    WHERE id_produto = NEW.id_produto;
+
+    IF NEW.tipo = 'saida' THEN
+        IF estoque_atual < NEW.quantidade THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Estoque insuficiente';
+        ELSE
+            UPDATE produto
+            SET quantidade = quantidade - NEW.quantidade
+            WHERE id_produto = NEW.id_produto;
+        END IF;
+
+    ELSEIF NEW.tipo = 'entrada' THEN
+        UPDATE produto
+        SET quantidade = quantidade + NEW.quantidade
+        WHERE id_produto = NEW.id_produto;
+    END IF;
+
+END$$
+
+DELIMITER ;
