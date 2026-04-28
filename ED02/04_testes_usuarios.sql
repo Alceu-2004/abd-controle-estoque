@@ -287,52 +287,38 @@ SELECT id_usuario, nome_usuario, email, LEFT(senha_hash,20) AS hash_parcial,
 FROM usuarios_app;
 
 -- ----------------------------------------------------------
--- T28 ✅ DEVE FUNCIONAR — SHOW GRANTS dos outros usuários
+-- T28 ✅ DEVE FUNCIONAR — Chamar procedure de auditoria
 -- ----------------------------------------------------------
 USE controle_estoque;
 
-SELECT 'T28 - SHOW GRANTS usr_consulta' AS teste;
-SHOW GRANTS FOR 'usr_consulta'@'localhost';
-
-SELECT 'T28 - SHOW GRANTS usr_operador' AS teste;
-SHOW GRANTS FOR 'usr_operador'@'localhost';
-
-SELECT 'T28 - SHOW GRANTS usr_gerente' AS teste;
-SHOW GRANTS FOR 'usr_gerente'@'localhost';
-
--- ----------------------------------------------------------
--- T29 ✅ DEVE FUNCIONAR — Chamar procedure de auditoria
--- ----------------------------------------------------------
-USE controle_estoque;
-
-SELECT 'T29 - CALL sp_checkpoint' AS teste;
+SELECT 'T28 - CALL sp_checkpoint' AS teste;
 CALL sp_checkpoint();
 
 -- ----------------------------------------------------------
--- T30 ✅ DEVE FUNCIONAR — Testar login válido via procedure
+-- T29 ✅ DEVE FUNCIONAR — Testar login válido via procedure
 -- ----------------------------------------------------------
 USE controle_estoque;
 
-SELECT 'T30 - Login valido (joao_silva)' AS teste;
+SELECT 'T29 - Login valido (joao_silva)' AS teste;
 CALL sp_validar_login('joao_silva', 'JoaoSenha123');
 SELECT ultimo_acesso FROM usuarios_app WHERE nome_usuario = 'joao_silva';
 
 -- ----------------------------------------------------------
--- T31 ✅ DEVE FUNCIONAR — Testar login inválido via procedure
+-- T30 ✅ DEVE FUNCIONAR — Testar login inválido via procedure
 -- ----------------------------------------------------------
 USE controle_estoque;
 
-SELECT 'T31 - Login invalido (senha errada)' AS teste;
+SELECT 'T30 - Login invalido (senha errada)' AS teste;
 CALL sp_validar_login('joao_silva', 'senhaErrada');
 SELECT valor_novo FROM log_auditoria
 WHERE tabela = 'LOGIN' ORDER BY data_hora DESC LIMIT 2;
 
 -- ----------------------------------------------------------
--- T32 ✅ DEVE FUNCIONAR — Testar undo de produto (auditoria)
+-- T31 ✅ DEVE FUNCIONAR — Testar undo de produto (auditoria)
 -- ----------------------------------------------------------
 USE controle_estoque;
 
-SELECT 'T32 - sp_undo_produto (revertendo produto 1)' AS teste;
+SELECT 'T31 - sp_undo_produto (revertendo produto 1)' AS teste;
 -- Primeiro faz um UPDATE para gerar log
 UPDATE produto SET preco = 9999.00, nome = 'Produto Alterado Teste' WHERE id_produto = 1;
 -- Verifica o log gerado
@@ -343,11 +329,25 @@ CALL sp_undo_produto(1);
 SELECT id_produto, nome, preco FROM produto WHERE id_produto = 1;
 
 -- ----------------------------------------------------------
--- T33 ✅ DEVE FUNCIONAR — Conceder permissão a outro usuário (GRANT OPTION)
+-- T32 ✅ DEVE FUNCIONAR — Conceder permissão a outro usuário (GRANT OPTION)
 -- ----------------------------------------------------------
 USE controle_estoque;
 
-SELECT 'T33 - GRANT SELECT em log_auditoria para usr_gerente' AS teste;
+SELECT 'T32 - GRANT SELECT em log_auditoria para usr_gerente' AS teste;
 GRANT SELECT ON controle_estoque.log_auditoria TO 'usr_gerente'@'localhost';
 -- Revogar em seguida para não alterar o modelo original
 REVOKE SELECT ON controle_estoque.log_auditoria FROM 'usr_gerente'@'localhost';
+
+-- ----------------------------------------------------------
+-- T33 ❌ DEVE FALHAR — Permissão global concedida só pelo root
+-- ----------------------------------------------------------
+USE controle_estoque;
+
+SELECT 'T33 - SHOW GRANTS usr_consulta' AS teste;
+SHOW GRANTS FOR 'usr_consulta'@'localhost';
+
+SELECT 'T33 - SHOW GRANTS usr_operador' AS teste;
+SHOW GRANTS FOR 'usr_operador'@'localhost';
+
+SELECT 'T33 - SHOW GRANTS usr_gerente' AS teste;
+SHOW GRANTS FOR 'usr_gerente'@'localhost';
