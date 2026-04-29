@@ -1,115 +1,59 @@
-# 📦 Sistema de Controle de Estoque
+# Controle de Estoque - Banco de Dados
 
-Projeto desenvolvido para a disciplina de Administração de Banco de Dados, com foco na modelagem, implementação e validação de um sistema de controle de estoque utilizando MySQL.
-
----
-
-## 🎯 Objetivo
-
-O objetivo deste projeto é implementar um banco de dados relacional capaz de gerenciar produtos, categorias, fornecedores e movimentações de estoque, garantindo a integridade dos dados por meio de restrições e regras de negócio automatizadas.
+Projeto desenvolvido para a disciplina de Administração de Banco de Dados, utilizando MySQL 8.0 e MySQL Workbench.
 
 ---
 
-## 🧠 Funcionalidades
+## Parte 1 - Modelagem e Integridade
 
-* Cadastro de **categorias**
-* Cadastro de **fornecedores**
-* Cadastro de **produtos**
-* Registro de **movimentações de estoque** (entrada e saída)
-* Atualização automática do estoque por meio de **trigger**
-* Validação de integridade com:
+Modelagem de um banco de dados relacional completo com restrições de integridade, operações que envolvem validação e controle de dados.
 
-  * `PRIMARY KEY`
-  * `FOREIGN KEY`
-  * `CHECK`
-  * `NOT NULL`
+**Arquivos:**
+- `01_estrutura_basica.sql` → criação do banco, tabelas, chaves, constraints e trigger de estoque
+- `02_testes_ed01.sql` → testes de validação
+
+**Tabelas:** `categoria`, `fornecedor`, `produto`, `movimentacao`
 
 ---
 
-## ⚙️ Tecnologias Utilizadas
+## Parte 2 - Segurança e Controle de Acesso
 
-* MySQL
-* MySQL Workbench
+Implementação de mecanismos de segurança, controle de acesso por perfil e auditoria de operações.
 
----
+**Arquivos:**
+- `02_auditoria.sql` → tabela de log, triggers de auditoria e procedure de reversão
+- `03_seguranca.sql` → usuários, roles, permissões (GRANT/REVOKE) e views
+- `04_testes_usuario.sql` → 33 testes individuais por perfil de usuário
 
-## 🗂️ Estrutura do Repositório
+**Usuários criados:**
 
-```
-controle-estoque-bd/
-│
-├── sql/
-│   ├── estrutura.sql       # Criação do banco, tabelas e trigger
-│   ├── testes.sql          # Scripts de teste (inserções e validações)
-│   └── completo.sql        # (Opcional) Script completo
-│
-├── modelos/
-│   ├── modelo_conceitual.png
-│   └── modelo_logico.png
-│
-├── imagens/
-│   ├── insercao_valida_categoria.png
-│   ├── insercao_valida_produto.png
-│   ├── erro_check.png
-│   ├── erro_not_null.png
-│   ├── trigger_entrada.png
-│   ├── trigger_saida.png
-│   ├── erro_trigger.png
-│   └── consulta_final.png
-│
-└── README.md
-```
+| Usuário | Perfil |
+|---|---|
+| `usr_consulta` | Somente leitura |
+| `usr_operador` | Consulta + movimentações |
+| `usr_gerente` | Operador + manutenção de produtos |
+| `usr_dba` | Administrador total (GRANT OPTION) |
 
 ---
 
-## 🚀 Como Executar o Projeto
+## Como Executar
 
-1. Abra o MySQL Workbench
-2. Execute o script de estrutura:
+Execute os scripts na ordem numérica com um usuário root no Workbench.
 
-   ```sql
-   sql/estrutura.sql
-   ```
-3. Execute o script de testes:
+Para testar as permissões, abra uma conexão separada para cada usuário e execute o bloco correspondente em `04_testes_usuario.sql`, rodando `SET ROLE ALL;` logo após conectar.
 
-   ```sql
-   sql/testes.sql
-   ```
-4. Utilize os comandos `SELECT` para verificar os resultados
+<p align="center">
+  <img src="./ED02/Casos de Teste - ED02/Conexões.png" alt="conexões"/>
+</p>
 
 ---
 
-## ⚙️ Funcionamento da Trigger
+## Integrantes
 
-Foi implementada uma trigger para garantir a atualização automática do estoque:
-
-* Movimentações do tipo **entrada** aumentam o estoque
-* Movimentações do tipo **saída** diminuem o estoque
-* Caso a quantidade de saída seja maior que o estoque disponível, a operação é bloqueada
-
-Essa abordagem garante que o estoque nunca assuma valores negativos, mantendo a integridade dos dados.
-
----
-
-## 🧪 Testes Realizados
-
-Foram realizados testes para validar:
-
-* Inserções válidas de dados
-* Regras de integridade (CHECK e NOT NULL)
-* Funcionamento da trigger
-* Bloqueio de operações inválidas
-
-Os resultados dos testes podem ser visualizados na pasta `imagens/`.
-
----
-
-## 👥 Integrantes
-
-* Alceu Botelho
-* Andrezza Piloni
-* Clara Ferreira
-* Eduardo Milione
-* Felipe Bignoto
-* Murilo Schittino
-* Vinícius Loures
+- ALCEU VASCONCELLOS BOTELHO DOS REIS
+- CLARA ROCHA FERREIRA
+- EDUARDO GOMES MILIONE
+- FELIPE BIGNOTO PALACIO
+- LENNON PEREIRA RANGEL
+- MURILO PÉRES SILVA SCHITTINO DE CARVALHO
+- VINÍCIUS LOURES OLIVEIRA
